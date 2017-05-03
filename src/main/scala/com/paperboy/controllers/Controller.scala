@@ -26,11 +26,11 @@ class Controller extends Actor with ActorLogging{
   // set of child controllers
   var children = Set.empty[ActorRef]
   
-  def receive = {
+  def receive: Receive = {
     case Check(url, depth) =>
      
       if(!cache(url) && depth > 0)
-        children += context.actorOf((Props(new Getter(url, depth - 1))))
+        children += context.actorOf(Props(new Getter(url, depth - 1)))
         cache +=url
     case Getter.Done =>
         children -= sender

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd ">
+
+    <!-- Initialization for data source -->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+        <property name="url" value="jdbc:mariadb://mariadb/TRANSPORTER"/>
+        <property name="username" value="transporter"/>
+        <property name="password" value="devenv"/>
+    </bean>
+
+    <!-- Definition for studentJDBCTemplate bean -->
+    <bean id="QueryJDBCTemplate"
+          class="com.transporter.beans.Region">
+        <property name="dataSource"  ref="dataSource" />
+    </bean>
+    <bean id="QueryJDBCTemplateUser"
+          class="com.transporter.beans.User">
+        <property name="dataSource"  ref="dataSource" />
+    </bean>
+
+</beans>
