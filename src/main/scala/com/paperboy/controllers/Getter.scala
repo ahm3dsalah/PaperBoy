@@ -4,7 +4,8 @@ package com.paperboy.controllers
 
 import akka.actor.Actor
 import java.util.concurrent.Executor
-import scala.concurrent.ExecutionContext
+
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 import scala.util.Failure
 import akka.actor.Status
@@ -29,7 +30,7 @@ class Getter(url: String, depth: Int) extends Actor{
  
   
   // this function from WebClient to get the body of certian url
-  val future = WebClient.get(url)
+  val future: Future[String] = WebClient.get(url)
   
   future onComplete {
     case Success(body) => self ! body
@@ -41,8 +42,7 @@ class Getter(url: String, depth: Int) extends Actor{
   def receive = {
     case body: String => 
       for(link <- WebClient.findLinks(body))
-          context.parent ! Contoller.Check(link, depth) 
-        
+          context.parent ! Contoller.Check(link, depth)
            stop()
         
     case _: Status.Failure => stop()
