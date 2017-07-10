@@ -32,17 +32,18 @@ class PaperBoyMain extends Actor{
   context.setReceiveTimeout(10 second)
   
   def receive: Receive = {
-    case Result(url, set) => 
-      val mySeq = set.toSeq.map(x => url+x)
-      val temp = mySeq.filter(p => p.contains("story"))
-      temp.foreach(println)
+    case Result(linksCollection: LinksCollection) =>
+      val mySeq = linksCollection.links.toSeq
+      mySeq.foreach(println)
       
     case Failed(url) =>
       println("faild to fetch ", url)
 
-    case future : Future[Seq[NewsAgent]] => future.onComplete{
-      case Success(seq) => seq.foreach(println)
-      case Failure(err) => println("FAILED")
+    case future : Future[Seq[NewsAgent]] => future.onSuccess {
+      case seq => seq.foreach {
+        // send the receptionist each news agent to parse
+        case newsAgent => reciptionist ! Reciptionist.Get(newsAgent)
+      }
     }
       
     case ReceiveTimeout => 

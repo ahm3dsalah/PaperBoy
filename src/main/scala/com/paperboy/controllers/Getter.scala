@@ -11,7 +11,7 @@ import scala.util.Failure
 import akka.actor.Status
 import akka.actor.Props
 import akka.actor.actorRef2Scala
-
+import com.paperboy.model._
 
 object Getter {
   
@@ -21,7 +21,7 @@ object Getter {
   case object Failed
   case object Abort
 }
-class Getter(url: String, depth: Int) extends Actor{
+class Getter(newsAgent: NewsAgent) extends Actor{
   import Getter._
   
   implicit val exec = context.dispatcher.asInstanceOf[Executor with ExecutionContext]
@@ -30,21 +30,26 @@ class Getter(url: String, depth: Int) extends Actor{
  
   
   // this function from WebClient to get the body of certian url
-  val future: Future[String] = WebClient.get(url)
+  val future: Future[PromiseRespons] = WebClient.get(newsAgent)
   
   future onComplete {
-    case Success(body) => self ! body
+    case Success(promiseResponse) => self ! promiseResponse
     case Failure(err) => self ! Status.Failure(err)
   }
   
   // the recieve which is the result of the parsing of url
   
   def receive = {
-    case body: String => 
-      for(link <- WebClient.findLinks(body))
-          context.parent ! Contoller.Check(link, depth)
-           stop()
-        
+    case promiseResponse: PromiseRespons =>
+      // return links collection which contains agentId and links
+      val linksCollection: LinksCollection = WebClient.findLinks(promiseResponse)
+      context.parent ! Reciptionist.Result(linksCollection)
+      stop()
+
+    /*for(link <- WebClient.findLinks(body))
+          context.parent ! Contoller.Check(link)
+           stop()*/
+
     case _: Status.Failure => stop()
     case Abort => stop() 
   }

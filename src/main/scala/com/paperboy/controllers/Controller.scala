@@ -11,10 +11,10 @@ import akka.actor.ReceiveTimeout
 import akka.actor.actorRef2Scala
 
 
-
+// depricated
 object Contoller {
   val props = Props[Controller]
-  case class Check(url: String, depth: Int)
+  case class Check(url: String)
   case class Result(links: Set[String])
 }
 class Controller extends Actor with ActorLogging{
@@ -27,11 +27,11 @@ class Controller extends Actor with ActorLogging{
   var children = Set.empty[ActorRef]
   
   def receive: Receive = {
-    case Check(url, depth) =>
+    /*case Check(url) =>
      
-      if(!cache(url) && depth > 0)
-        children += context.actorOf(Props(new Getter(url, depth - 1)))
-        cache +=url
+      if(!cache(url))
+        children += context.actorOf(Props(new Getter(url)))
+        cache +=url*/
     case Getter.Done =>
         children -= sender
         if(children.isEmpty) context.parent ! Result(cache)
