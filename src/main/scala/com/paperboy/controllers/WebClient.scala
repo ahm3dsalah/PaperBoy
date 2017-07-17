@@ -25,7 +25,7 @@ object WebClient {
       else if (quote != null) quote
       else bare
 
-    LinksCollection(promiseResponse.agentId, links)
+    LinksCollection(promiseResponse.agentId, promiseResponse.agentUrl, links)
   }
   
   
@@ -40,7 +40,7 @@ object WebClient {
       def run = {
         val respons = f.get()
         if(respons.getStatusCode < 400){
-          p.success(PromiseRespons(respons.getResponseBodyExcerpt(1000000), agentId))
+          p.success(PromiseRespons(newsAgent.url, respons.getResponseBodyExcerpt(1000000), agentId))
         }
         else
           throw new Exception("bad request")

@@ -23,21 +23,20 @@ class PaperBoyMain extends Actor{
   val newsAgentController = context.actorOf(NewsAgentsController.props)
 
 
-
-  //reciptionist ! Get("http://www.youm7.com")
-
   newsAgentController ! GET_AGENTS
 
 
   context.setReceiveTimeout(10 second)
   
   def receive: Receive = {
-    case Result(linksCollection: LinksCollection) =>
-      val mySeq = linksCollection.links.toSeq
+    case Result(linksCollection: LinksCollection) => {
+      val baseUrl = linksCollection.agentUrl
+      val mySeq = linksCollection.links.filter(x => x.contains("story")).map(x => baseUrl+x)
       mySeq.foreach(println)
+    }
       
     case Failed(url) =>
-      println("faild to fetch ", url)
+      println("failed to fetch ", url)
 
     case future : Future[Seq[NewsAgent]] => future.onSuccess {
       case seq => seq.foreach {

@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
     exclude("com.zaxxer", "HikariCP-java6"),
   "com.zaxxer" % "HikariCP" % "2.4.1",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
-  "org.mariadb.jdbc" % "mariadb-java-client" % "1.4.5"
+  "org.mariadb.jdbc" % "mariadb-java-client" % "1.4.5",
+  "org.jsoup" % "jsoup" % "1.8.3"
 )
 resourceDirectory in Compile := baseDirectory.value / "src" / "main" / "resources"

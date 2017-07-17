@@ -29,7 +29,7 @@ class Getter(newsAgent: NewsAgent) extends Actor{
 
  
   
-  // this function from WebClient to get the body of certian url
+  // this function from WebClient to get the body of certain url
   val future: Future[PromiseRespons] = WebClient.get(newsAgent)
   
   future onComplete {
@@ -37,7 +37,7 @@ class Getter(newsAgent: NewsAgent) extends Actor{
     case Failure(err) => self ! Status.Failure(err)
   }
   
-  // the recieve which is the result of the parsing of url
+  // the receive which is the result of the parsing of url
   
   def receive = {
     case promiseResponse: PromiseRespons =>
