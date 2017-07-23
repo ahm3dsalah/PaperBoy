@@ -38,9 +38,9 @@ object WebClient {
     f.addListener(new Runnable {
       
       def run = {
-        val respons = f.get()
-        if(respons.getStatusCode < 400){
-          p.success(PromiseRespons(newsAgent.url, respons.getResponseBodyExcerpt(1000000), agentId))
+        val response = f.get()
+        if(response.getStatusCode < 400){
+          p.success(PromiseRespons(newsAgent.url, response.getResponseBodyExcerpt(1000000), agentId))
         }
         else
           throw new Exception("bad request")

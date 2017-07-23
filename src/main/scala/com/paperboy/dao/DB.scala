@@ -16,7 +16,7 @@ object DB extends MySQLDriver{
 
 
   class NewsAgents(tag: Tag) extends Table[NewsAgent](tag, "NEWS_AGENTS") {
-    def agentId: Rep[Int] = column[Int]("AGENT_ID", O.PrimaryKey) // This is the primary key column
+    def agentId: Rep[Int] = column[Int]("AGENT_ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
     def url: Rep[String] = column[String]("URL", O.Length(50))
 
     // Every table needs a * projection with the same type as the table's type parameter
@@ -25,7 +25,7 @@ object DB extends MySQLDriver{
   val newsAgents = TableQuery[NewsAgents]
 
   class NewsDetails(tag: Tag) extends Table[NewsDetail](tag, "NEWS_DETAILS") {
-    def id: Rep[Int] =  column[Int]("ID", O.PrimaryKey) // This is the primary key column
+    def id: Rep[Int] =  column[Int]("ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
     def agentId: Rep[Int] = column[Int]("AGENT_ID")
     def newsUrl: Rep[String] = column[String]("NEWS_URL", O.Length(50))
     def header: Rep[String] = column[String]("HEADER", O.Length(50))
@@ -35,13 +35,14 @@ object DB extends MySQLDriver{
     def * = (id, agentId, newsUrl, header, body) <> ((NewsDetail.apply _).tupled, NewsDetail.unapply)
 
     // foreign key to news agent table
-    def branch = foreignKey("NEWS_DETAILS_NEWS_AGENT_FK", agentId, newsAgents)(_.agentId)
+    def newsAgent = foreignKey("NEWS_DETAILS_NEWS_AGENT_FK", agentId, newsAgents)(_.agentId)
   }
 
   val newsDetails = TableQuery[NewsDetails]
 
-  def printCreateStatment(): Unit = {
-    newsAgents.schema.createStatements.foreach(s => println(s.toUpperCase.concat(";")))
+  //printCreateStatement()
+  def printCreateStatement(): Unit = {
+    //newsAgents.schema.createStatements.foreach(s => println(s.toUpperCase.concat(";")))
     newsDetails.schema.createStatements.foreach(s => println(s.toUpperCase.concat(";")))
   }
 }
