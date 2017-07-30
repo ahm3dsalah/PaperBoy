@@ -27,9 +27,9 @@ object DB extends MySQLDriver{
   class NewsDetails(tag: Tag) extends Table[NewsDetail](tag, "NEWS_DETAILS") {
     def id: Rep[Int] =  column[Int]("ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
     def agentId: Rep[Int] = column[Int]("AGENT_ID")
-    def newsUrl: Rep[String] = column[String]("NEWS_URL", O.Length(50))
-    def header: Rep[String] = column[String]("HEADER", O.Length(50))
-    def body: Rep[String] = column[String]("BODY", O.Length(50))
+    def newsUrl: Rep[String] = column[String]("NEWS_URL", O.Length(1000))
+    def header: Rep[String] = column[String]("HEADER", O.Length(1000))
+    def body: Rep[String] = column[String]("BODY", O.Length(1000))
 
     // Every table needs a * projection with the same type as the table's type parameter
     def * = (id, agentId, newsUrl, header, body) <> ((NewsDetail.apply _).tupled, NewsDetail.unapply)

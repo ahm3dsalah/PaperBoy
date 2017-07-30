@@ -1,11 +1,12 @@
 package com.paperboy.controllers
 
-import akka.actor.Actor
+import akka.actor.{Actor, Props}
+
 import scala.concurrent.duration._
 import com.paperboy.controllers.NewsAgentsController._
 import com.paperboy.model._
+
 import scala.concurrent.Future
-import org.jsoup.nodes.Element
 
 class PaperBoyMain extends Actor{
   import Reciptionist._
@@ -13,41 +14,33 @@ class PaperBoyMain extends Actor{
 
   val reciptionist = context.actorOf(Reciptionist.props)
   val newsAgentController = context.actorOf(NewsAgentsController.props)
-  val parser = context.actorOf(Parser.props)
-
-
-
+  // get news agents first
   newsAgentController ! GET_AGENTS
-  parser ! "http://www.youm7.com/story/2017/7/17/بعد-22-يوم-عرض-السقا-يصل-لـ43-مليونًا-ويسجل-أعلى/3329107"
 
   context.setReceiveTimeout(10 second)
   
   def receive: Receive = {
     case Result(linksCollection: LinksCollection) => {
+      val agentId = linksCollection.agentId
       val baseUrl = linksCollection.agentUrl
-      val mySeq = linksCollection.links.filter(x => x.contains("story")).map(x => baseUrl + x)
-      //mySeq.foreach(println)
-    }
+      val links = linksCollection.links.map(x => baseUrl + x)
 
-    case Failed(url) =>
-      println("failed to fetch ", url)
+      links foreach { link =>
+        context.actorOf(Props(new Parser(agentId, link)))
+        //println(link)
+      }
+    }
 
     case future: Future[Seq[NewsAgent]] => future.onSuccess {
       case seq => seq.foreach {
         // send the receptionist each news agent to parse
-        case newsAgent => reciptionist ! Reciptionist.Get(newsAgent)
+        case newsAgent =>
+          reciptionist ! Reciptionist.Get(newsAgent)
       }
-    }
-    case title: String =>
-      println(title)
-
-    case list: Iterator[Element] =>
-      list.foreach(println)
-
-    /*case ReceiveTimeout =>
+      /*case ReceiveTimeout =>
       println("timeout")
       context.stop(self)*/
-
+    }
   }
   
   override def postStop(): Unit = {

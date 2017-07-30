@@ -46,10 +46,6 @@ class Getter(newsAgent: NewsAgent) extends Actor{
       context.parent ! Reciptionist.Result(linksCollection)
       stop()
 
-    /*for(link <- WebClient.findLinks(body))
-          context.parent ! Contoller.Check(link)
-           stop()*/
-
     case _: Status.Failure => stop()
     case Abort => stop() 
   }
